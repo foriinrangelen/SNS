@@ -22,7 +22,7 @@ usersRouter.post("/login", (req, res, next) => {
       // 에러 발생시 에러처리기로 이동
       if (err) return next(err);
       // 로그인 성공시 루트페이지로 이동
-      res.redirect("/");
+      res.redirect("/posts");
     });
   })(req, res, next); // 미들웨어 안의 미들웨어를 호출하려면 ()을붙여 호출을 추가로 해줘야하고 안에 req,res,next 매개변수도 넣어줘야한다
 });
@@ -47,7 +47,7 @@ usersRouter.post("/signup", async (req, res) => {
     await user.save();
     // 회원가입한 유저에게 메일 보내기 임시주석
     // sendMail('받는사람 이메일', '받는사람이름', '타입');
-    res.redirect("/");
+    res.redirect("/posts");
   } catch (e) {
     console.log(e);
   }
@@ -59,7 +59,7 @@ usersRouter.get("/google", passport.authenticate("google"));
 // prettier-ignore
 usersRouter.get("/google/callback", passport.authenticate("google", {
     // 성공했을 시 이동할 주소
-    successReturnToOrRedirect: "/",
+    successReturnToOrRedirect: "/posts",
     // 실패 시 이동할 주소
     failureRedirect: "/login",
   })

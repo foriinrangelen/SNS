@@ -119,6 +119,10 @@ const GoogleStrategyConfig = new GoogleStrategy(
       // DB에 존재하지 않는다면(가입하지 않은 유저라면) 새로운 유저를 생성해서 user정보 return 해서 done으로 api 콜백으로 보내기
       const newUser = await new User({
         email: profile.emails[0].value,
+        // 유저필드에 들어갈값 추가(구글에서 제공해주는값)
+        username: profile.displayName,
+        firstName: profile.givenName,
+        lastName: profile.familyName,
         googleId: profile.id,
       }).save();
       return done(null, newUser);

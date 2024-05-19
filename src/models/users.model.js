@@ -1,34 +1,74 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 // 스키마 생성
-const userSchema = new mongoose.Schema({
-  email: {
-    // 타입지정
-    type: String,
-    // 똑같은 이메일 사용하지못하게 (유효성 체크)
-    unique: true,
+const userSchema = new mongoose.Schema(
+  {
+    email: {
+      // 타입지정
+      type: String,
+      // 똑같은 이메일 사용하지못하게 (유효성 체크)
+      unique: true,
+    },
+    password: {
+      type: String,
+      // 비밀번호는 최소 5자리 이상으로 설정 (유효성 체크)
+      minLength: 5,
+    },
+    googleId: {
+      type: String,
+      unique: true,
+      // sparse: true,: sparse index라고하고
+      // 기본적으로 email, password를 이용한 로그인 하나(로컬 로그인)와 googleId를 이용한 로그인 두가지를 구현하는데
+      // 로컬로그인시 구글로그인 필드는 null, 다시 구글로그인을 하고 다시 로컬로그인을 실행하면 구글아이디는 다시 null값이 들어오게되서
+      // googleId 의 unique에 제약이 걸리기때문에(에러발생) 방지하기 위해 사용
+      sparse: true,
+    },
+    kakaoId: {
+      type: String,
+      unique: true,
+      sparse: true,
+    },
+    // sns 위한 필드 추가하기
+    username: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    firstName: {
+      type: String,
+      dafault: "Frist Name",
+    },
+    lastName: {
+      type: String,
+      dafault: "Last Name",
+    },
+    bio: {
+      type: String,
+      dafault: "데이터 없음",
+    },
+    hometown: {
+      type: String,
+      dafault: "데이터 없음",
+    },
+    workspace: {
+      type: String,
+      dafault: "데이터 없음",
+    },
+    education: {
+      type: String,
+      dafault: "데이터 없음",
+    },
+    contact: {
+      type: String,
+      dafault: "데이터 없음",
+    },
+    friends: [{ type: String }],
+
+    friendsRequests: [{ type: String }],
   },
-  password: {
-    type: String,
-    // 비밀번호는 최소 5자리 이상으로 설정 (유효성 체크)
-    minLength: 5,
-  },
-  googleId: {
-    type: String,
-    unique: true,
-    // sparse: true,: sparse index라고하고
-    // 기본적으로 email, password를 이용한 로그인 하나(로컬 로그인)와 googleId를 이용한 로그인 두가지를 구현하는데
-    // 로컬로그인시 구글로그인 필드는 null, 다시 구글로그인을 하고 다시 로컬로그인을 실행하면 구글아이디는 다시 null값이 들어오게되서
-    // googleId 의 unique에 제약이 걸리기때문에(에러발생) 방지하기 위해 사용
-    sparse: true,
-  },
-  kakaoId: {
-    type: String,
-    unique: true,
-    sparse: true,
-  },
-  // sns 위한 필드 추가하기
-});
+  // collection 안에 데이터가 들어갈때 자동으로 시간추가
+  { timestamps: true }
+);
 // salt길이 설정
 const saltRounds = 10;
 // pre(): save()이전에 실행될 메서드 정의하기- 비밀번호 salt+hash화 하기
@@ -53,13 +93,16 @@ userSchema.pre("save", function (next) {
     next();
   }
 });
-userSchema.methods.comparePassword = async (plainPassword) => {
+userSchema.methods.comparePassword = async function (plainPassword) {
   try {
     // bcrypt.compare()는 Promise를 반환하므로 await
     // plainPassword와 this.password를 비교한 후, 결과로 boolean 값을 반환
     // plainPassword: 사용자에 입력받은 평문 password
     // this.password: mongoose 모델 인스턴스의 패스워드(이미 salt+해시화된 비밀번호)
     // this는 함수가 호출될때 결정되기때문에 comparePassword()메서드가 호출될때에는 findOne해서 찾아온 유저인스턴스를 가리킴
+    console.log("plainPassword : " + plainPassword);
+    console.log("this.password : " + this.password);
+    console.log("this : " + this);
     const isMatch = await bcrypt.compare(plainPassword, this.password);
     return isMatch;
   } catch (err) {

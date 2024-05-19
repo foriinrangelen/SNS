@@ -15,7 +15,7 @@ const usersRouter = require("./routes/user.router");
 const postsRouter = require("./routes/posts.router");
 const commentsRouter = require("./routes/comments.router");
 const profileRouter = require("./routes/profile.router");
-const likeRouter = require("./routes/like.router");
+const likesRouter = require("./routes/likes.router");
 const friendsRouter = require("./routes/friends.router");
 
 // 임시 key
@@ -83,7 +83,7 @@ app.use("/posts", postsRouter);
 app.use("/posts/:id/comments", commentsRouter);
 app.use("/profile/:id", profileRouter);
 app.use("/friends", friendsRouter);
-app.use("/posts/:id/like", likeRouter);
+app.use("/posts/:id/like", likesRouter);
 
 const PORT = 4000;
 app.listen(PORT, () => {
