@@ -84,7 +84,11 @@ app.use("/posts/:id/comments", commentsRouter);
 app.use("/profile/:id", profileRouter);
 app.use("/friends", friendsRouter);
 app.use("/posts/:id/like", likesRouter);
-
+// 에러 처리기 등록
+app.use((err, req, res, next) => {
+  console.log(err);
+  res.status(err.status || 500).send(err.message || "Error Occured");
+});
 const PORT = 4000;
 app.listen(PORT, () => {
   console.log(`listening on port ${PORT}`);

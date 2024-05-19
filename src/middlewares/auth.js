@@ -2,12 +2,12 @@
 // 세션은passport.serializeUser에서 생성된다
 
 function isAuth(req, res, next) {
-  console.log(req.isAuthenticated());
-  console.log(req.user, req.isAuthenticated());
+  // console.log(req.isAuthenticated());
+  // console.log(req.user, req.isAuthenticated());
   if (req.isAuthenticated()) {
     return next();
   }
-  console.log("?????????");
+  // console.log("?????????");
   res.redirect("/login");
 }
 
