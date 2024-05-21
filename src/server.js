@@ -3,7 +3,10 @@ const { default: mongoose } = require("mongoose");
 const path = require("path");
 const User = require("./models/users.model");
 const app = express();
-
+// connect-flash 사용하기위해
+const flash = require("connect-flash");
+// method-override 사용하기위해
+const methodOverride = require("method-override");
 // .env환경변수 설정파일을 사용하기위해
 require("dotenv").config();
 // passport 모듈 사용하기
@@ -58,13 +61,15 @@ app.use(passport.initialize());
 // serializeUser: 사용자 인증 성공 시, 사용자 정보를 세션에 저장하는 방법을 정의
 // deserializeUser: 각 요청 시, 세션에서 사용자 정보를 불러오는 방법을 정의
 app.use(passport.session());
-
+// connect-flash 연결
+app.use(flash());
 app.use(express.json());
 // form태그에서 전달받은 값을 받기위한 미들웨어
 app.use(express.urlencoded({ extended: false }));
 // 경로 수정 (sns)
 app.use(express.static(path.join(__dirname, "public")));
-
+// 메소드 오버라이드 등록
+app.use(methodOverride('_method'));
 // view engine 설정
 app.set("views", path.join(__dirname, "views"));
 // console.log(path.join(__dirname, "views"));
@@ -75,6 +80,18 @@ mongoose.connect(process.env.MONGO_URI)
   .then(() => {console.log("connected to mongodb");})
   .catch((err) => {console.log(err);});
 // console.log(path.join(__dirname, "..", "public"));
+
+// 페이지를 새로고침하면 세션에서 메세지가 사라지기때문에 아무것도 안보이게된다
+// connect-flash는 휘발성으로 한번 실행되면 세션에서 저장값이 사라진다
+app.use((req,res,next)=>{
+  // res.locals: 값을 저장할수있게 해주는 객체, 요청이 끝나면 사라진다
+  // connect-flash를 전체 라우터에서 사용할 수 있게 미들웨어로 등록
+  res.locals.error=req.flash("error");
+  res.locals.success=req.flash("success");
+  // views에서 세션값 사용하기위해 설정 해놓기(render로 굳이 값을 안넘겨 줘두댐)
+  res.locals.currentUser=req.user;
+  next();
+})
 
 // 라우터등록
 app.use("/", mainRouter);

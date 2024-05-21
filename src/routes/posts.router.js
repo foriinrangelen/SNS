@@ -1,5 +1,5 @@
 const express = require("express");
-const { isAuth } = require("../middlewares/auth");
+const { isAuth, checkPostOwnerShip } = require("../middlewares/auth");
 
 const router = express.Router();
 const Post = require("../models/posts.model");
@@ -36,11 +36,15 @@ router.post("/", isAuth, upload, async (req, res, next) => {
         username: req.user.username,
       },
     });
+    // connect-flash 사용
+    req.flash("success", "포스트 생성성공");
     res.redirect("back"); // 도 가능
     // res.redirect("/posts");
   } catch (err) {
     console.log(err);
-    next(err);
+    req.flash("error", "포스트 생성 실패");
+    res.redirect("back"); 
+    // next(err);
   }
 });
 
@@ -53,11 +57,46 @@ router.get("/", isAuth, async (req, res) => {
     // console.log(posts)
     res.render("posts", {
       posts: posts,
-      currentUser: req.user,
+      // currentUser: req.user,
+      // success: req.flash("success"),
+      // error: req.flash("error"),
     });
   } catch (err) {
     console.log(err);
-  }
+  }  
 });
 
+// 포스트 수정 라우터
+router.get("/:id/edit", checkPostOwnerShip, (req, res) => {
+  // checkPostOwnerShip 에서 찾은 post를 req객체에 넣어줘서 사용가능
+  res.render("posts/edit", {
+    post: req.post,
+  });
+})
+// 포스트 수정 업데이트 라우터
+router.put("/:id", checkPostOwnerShip, async (req, res) => {
+  try{
+  // req.body로 수정할내용 가져와서 업데이트하기
+  const updatePost= await Post.findByIdAndUpdate(req.params.id, req.body)
+  req.flash("success", "포스트 수정 성공");
+  res.redirect("/posts");
+  }catch(err){
+    req.flash("error", "포스트 수정 실패");
+    res.redirect("/posts");
+}
+})
+
+// 게시물 삭제 라우터
+router.delete("/:id", checkPostOwnerShip, async (req, res) => {
+  try {
+    await Post.findByIdAndDelete(req.params.id);
+    req.flash("success", "포스트 삭제 성공");
+    
+  } catch (err) {
+    req.flash("error", "포스트 삭제 실패");
+    
+  }finally{
+    res.redirect("/posts");
+  }
+})
 module.exports = router;

@@ -5,8 +5,6 @@
         <%- include('../partials/create-post') %>
     </div>
     <% posts.forEach((post) => { %>
-        <% console.log("posttt",post.author.id) %>
-        <% console.log("currentUser",currentUser._id) %>
         <!-- 나의 포스트인지 -->
         <% if (post.author.id.equals(currentUser._id) || 
         // 나의 친구의 포스트인지
