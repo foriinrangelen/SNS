@@ -75,7 +75,7 @@ router.put('/:CommentId',checkCommentOwnerShip, async(req, res)=> {
         req.flash("success", "댓글 수정성공")
         res.redirect('/posts')
     }catch(err){
-        console.log(error)
+        console.log(err)
         req.flash("error", "댓글 수정중 에러발생")
         res.redirect('back')
     }

@@ -36,31 +36,31 @@ const userSchema = new mongoose.Schema(
     },
     firstName: {
       type: String,
-      dafault: "Frist Name",
+      default: "First Name",
     },
     lastName: {
       type: String,
-      dafault: "Last Name",
+      default: "Last Name",
     },
     bio: {
       type: String,
-      dafault: "데이터 없음",
+      default: "데이터 없음",
     },
     hometown: {
       type: String,
-      dafault: "데이터 없음",
+      default: "데이터 없음",
     },
     workspace: {
       type: String,
-      dafault: "데이터 없음",
+      default: "데이터 없음",
     },
     education: {
       type: String,
-      dafault: "데이터 없음",
+      default: "데이터 없음",
     },
     contact: {
       type: String,
-      dafault: "데이터 없음",
+      default: "데이터 없음",
     },
     friends: [{ type: String }],
 

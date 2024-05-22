@@ -2,7 +2,7 @@
 // 세션은passport.serializeUser에서 생성된다
 const Post= require("../models/posts.model");
 const Comment= require("../models/comments.model");
-
+const User= require("../models/users.model");
 function isAuth(req, res, next) {
   // console.log(req.isAuthenticated());
   // console.log(req.user, req.isAuthenticated());
@@ -87,7 +87,33 @@ async function checkCommentOwnerShip(req, res, next) {
   }
 }
 
+// 프로필페이지에서 프로필수정을 버튼사람이 자신인지 확인하는 미들웨어
+async function checkIsMe(req,res,next){
+  try {
+  if(req.isAuthenticated()){
+    const findUser= await User.findById(req.params.id)
+    if(!findUser){
+      req.flash("error", "유저가 존재하지 않습니다");
+      res.redirect("/profile/"+req.params.id);
+      }else{
+        if(findUser._id.equals(req.user._id)){
+          next();
+        }else{
+          req.flash("error", "권한이 없습니다");
+          res.redirect("/profile/"+req.params.id);
+        }
+      }
+      
+    }
+  else{
+    req.flash("error", "로그인이 필요합니다");
+    res.redirect("/login");
+  }
+} catch (error) {
+  req.flash("error", "유저 확인도중 에러발생");
+  res.redirect("/profile/"+req.params.id);
+}}
 
 
 
-module.exports = { isAuth, isNotAuth, checkPostOwnerShip, checkCommentOwnerShip };
+module.exports = { isAuth, isNotAuth, checkPostOwnerShip, checkCommentOwnerShip, checkIsMe };
